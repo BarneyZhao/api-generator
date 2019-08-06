@@ -1,0 +1,72 @@
+{
+  "name": "api-generator",
+  "productName": "API Generator",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./app/main.js",
+  "scripts": {
+    "v": "vue-cli-service serve",
+    "el": "cross-env NODE_ENV=dev electron .",
+    "build-vue": "vue-cli-service build --no-clean",
+    "build-el": "cross-env NODE_ENV=prod electron-builder",
+    "build": "npm run build-vue && npm run build-el",
+    "build-win": "cross-env NODE_ENV=prod electron-builder --win --x64",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "core-js": "^2.6.5",
+    "element-ui": "^2.11.1",
+    "mustache": "^3.0.1",
+    "normalize.css": "^8.0.1",
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.3",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.10.0",
+    "@vue/cli-plugin-eslint": "^3.10.0",
+    "@vue/cli-plugin-typescript": "^3.10.0",
+    "@vue/cli-service": "^3.10.0",
+    "@vue/eslint-config-airbnb": "^4.0.0",
+    "@vue/eslint-config-typescript": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-component": "^1.1.1",
+    "cross-env": "^5.2.0",
+    "electron": "^6.0.0",
+    "electron-builder": "^21.2.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "less": "^3.0.4",
+    "less-loader": "^4.1.0",
+    "lint-staged": "^8.1.5",
+    "typescript": "^3.4.3",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "build": {
+    "appId": "com.electron.apigenerator",
+    "directories": {
+      "output": "e_dist"
+    },
+    "files": [
+      "app/**/*",
+      "dist/**/*"
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icon.icns"
+    },
+    "win": {
+      "target": "zip",
+      "icon": "public/icon.ico"
+    }
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,vue,ts}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  }
+}
