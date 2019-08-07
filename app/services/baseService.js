@@ -3,35 +3,43 @@ const Mustache = require('mustache');
 
 const API_MUSTACHE = `${__dirname}/../template/api.mustache`;
 
+const NUMBER = '[object Number]';
+const STRING = '[object String]';
+const BOOLEAN = '[object Boolean]';
+const ARRAY = '[object Array]';
+const OBJECT = '[object Object]';
+const NULL = '[object Null]';
+const UNDEFINED = '[object Undefined]';
+
 const buildInterfaceList = (obj, interfaceName, interfaceList, isRes) => {
   const resultObj = { interfaceName, fieldList: [], isRes };
   Object.entries(obj).forEach(([key, value]) => {
     const field = { key, type: '' };
     let arrItemType = '';
     switch (Object.prototype.toString.call(value)) {
-      case '[object Number]':
+      case NUMBER:
         field.type = 'number';
         break;
-      case '[object String]':
+      case STRING:
         field.type = 'string';
         break;
-      case '[object Boolean]':
+      case BOOLEAN:
         field.type = 'boolean';
         break;
-      case '[object Array]':
+      case ARRAY:
         arrItemType = Object.prototype.toString.call(value[0]);
-        if (arrItemType === '[object Null]' || arrItemType === '[object Undefined]') throw new Error(`数组${key}为空或item为Null/Undefined`);
-        if (arrItemType === '[object Array]') throw new Error(`暂不支持多维数组[${key}]`);
+        if (arrItemType === NULL || arrItemType === UNDEFINED) throw new Error(`数组${key}为空或item为Null/Undefined`);
+        if (arrItemType === ARRAY) throw new Error(`暂不支持多维数组[${key}]`);
 
-        if (arrItemType === '[object Number]') field.type = 'number[]';
-        else if (arrItemType === '[object String]') field.type = 'string[]';
-        else if (arrItemType === '[object Boolean]') field.type = 'boolean[]';
+        if (arrItemType === NUMBER) field.type = 'number[]';
+        else if (arrItemType === STRING) field.type = 'string[]';
+        else if (arrItemType === BOOLEAN) field.type = 'boolean[]';
         else {
           field.type = `${interfaceName}$${key}[]`;
           buildInterfaceList(value[0], `${interfaceName}$${key}`, interfaceList);
         }
         break;
-      case '[object Object]':
+      case OBJECT:
         field.type = `${interfaceName}$${key}`;
         buildInterfaceList(value, field.type, interfaceList);
         break;

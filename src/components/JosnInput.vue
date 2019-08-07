@@ -81,107 +81,23 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getFileNameByUrl, isJSON } from '../utils/strUtil';
-import * as biz from '../biz/mainBiz';
 
 export default Vue.extend({
-  name: 'Main',
+  name: 'JosnInput',
   data() {
     return {
-      apiFormRules: {
-        url: [
-          { required: true, message: '请输入url', trigger: 'blur' },
-        ],
-      },
-      apiForm: {
-        method: 'post',
-        url: '',
-        localUrl: '',
-        mockUrl: '',
-        apiParam: '',
-        apiResult: '',
-        outputPath: '',
-        fileNameType: '1',
-        fileName: '',
-      },
+
     };
   },
   computed: {
-    fileNameByUrl(): string {
-      return this.apiForm.url && getFileNameByUrl(this.apiForm.url);
-    },
-    paramJsonValid(): boolean {
-      return !!this.apiForm.apiParam && isJSON(this.apiForm.apiParam);
-    },
-    resultJsonValid(): boolean {
-      return !!this.apiForm.apiResult && isJSON(this.apiForm.apiResult);
-    },
+
   },
   methods: {
-    run() {
-      const that = this;
-      (this.$refs.apiForm as any).validate((valid: boolean) => {
-        if (valid) {
-          if (!that.apiForm.outputPath) {
-            that.$notify.warning('请选择文件生成路径');
-          } else if (!that.apiForm.apiResult) {
-            that.$notify.error('接口结果 JSON 不能为空');
-          } else {
-            const apiFileName = that.apiForm.fileNameType === '1' ? that.fileNameByUrl : that.apiForm.fileName;
-            biz.generateApiFile({ apiFileName, ...that.apiForm }).then((data: any) => {
-              if (!data.err) that.$notify.success(`文件${apiFileName}.ts生成成功！`);
-              else that.$notify.error(data.err.message || data.err);
-            }).catch((err) => {
-              that.$notify.error(err.message || err);
-            });
-          }
-        }
-      });
-    },
-    resetForm() {
-      (this.$refs.apiForm as any).resetFields();
-      this.apiForm.apiParam = '';
-      this.apiForm.apiResult = '';
-    },
-    selectSearchFolder() {
-      biz.selectFolder().then((data: any) => {
-        ([this.apiForm.outputPath] = data);
-      });
-    },
+
   },
 });
 </script>
 
-<style scoped>
-.valid-border >>> .el-textarea__inner {
-  border-color: #67C23A;
-}
-.unvalid-border >>> .el-textarea__inner {
-  border-color: #F56C6C;
-}
-</style>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-.main {
-  padding-right: 45px;
-}
-.data-json-text {
-  &-param {
-    padding-right: 10px;
-  }
-  &-result {
-    padding-left: 10px;
-  }
-}
-.output-folder-path {
-  margin-left: 20px;
-}
-.file-name-text {
-  display: inline-block;
-  min-width: 300px;
-}
-.action-button {
-  margin-left: 20px;
-}
+
 </style>
