@@ -21,12 +21,6 @@ const createWindow = async () => {
   if (!url) url = mainConfig.PROD_URL.replace('{0}', app.getAppPath());
   mainWindow.loadURL(url);
 
-  // Open the DevTools.
-  if (isDev) {
-    await installExtension(VUEJS_DEVTOOLS);
-    mainWindow.webContents.openDevTools();
-  }
-
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -34,6 +28,12 @@ const createWindow = async () => {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  // Open the DevTools.
+  if (isDev) {
+    await installExtension(VUEJS_DEVTOOLS);
+    mainWindow.webContents.openDevTools();
+  }
 };
 
 const setAppMenus = () => {
