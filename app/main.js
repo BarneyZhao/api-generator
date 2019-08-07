@@ -1,7 +1,7 @@
-/* eslint-disable import/no-dynamic-require */
+/* eslint-disable import/no-extraneous-dependencies, import/no-dynamic-require */
 // Modules to control application life and create native browser window
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { app, BrowserWindow, Menu } = require('electron');
+const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
 
 const mainConfig = require(`${app.getAppPath()}/app/main_config.js`);
 
@@ -11,7 +11,7 @@ let mainWindow;
 
 const isDev = process.env.NODE_ENV === 'dev';
 
-const createWindow = () => {
+const createWindow = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow(mainConfig.WINDOW_OPS);
 
@@ -22,7 +22,10 @@ const createWindow = () => {
   mainWindow.loadURL(url);
 
   // Open the DevTools.
-  if (isDev) mainWindow.webContents.openDevTools();
+  if (isDev) {
+    await installExtension(VUEJS_DEVTOOLS);
+    mainWindow.webContents.openDevTools();
+  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -69,4 +72,3 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 require(`${app.getAppPath()}/app/controllers/baseController.js`);
-// if (isDev) require('../server/main.js');
