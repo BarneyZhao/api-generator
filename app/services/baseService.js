@@ -11,17 +11,19 @@ const OBJECT = '[object Object]';
 const NULL = '[object Null]';
 const UNDEFINED = '[object Undefined]';
 
-const buildInterfaceList = (obj, interfaceName, interfaceList, isRes) => {
-  const resultObj = { interfaceName, fieldList: [], isRes };
+const buildInterfaceList = (obj, interfaceName, interfaceList, isResultType) => {
+  const resultObj = { interfaceName, fieldList: [], isResultType };
   Object.entries(obj).forEach(([key, value]) => {
-    const field = { key, type: '' };
+    const field = { key, type: '', isOptional: false };
     let arrItemType = '';
     switch (Object.prototype.toString.call(value)) {
       case NUMBER:
         field.type = 'number';
+        if (value === 0) field.isOptional = true;
         break;
       case STRING:
         field.type = 'string';
+        if (value === '') field.isOptional = true;
         break;
       case BOOLEAN:
         field.type = 'boolean';
@@ -54,14 +56,20 @@ const buildInterfaceList = (obj, interfaceName, interfaceList, isRes) => {
 exports.generateApi = (apiSettings) => {
   // eslint-disable-next-line max-len
   // const apiResultObj = JSON.parse('{"_systemTime":1564475084749,"code":"00000","test1":[1,2],"data":{"data":"6626410","message":"修改邀请信息成功","success":true,"test2":["string1","string2"]},"test3":[{"test4":1,"test5":[1,2],"test6":"123","test7":{"test8":[1,2]},"test9":[{"test10":1}]}],"isSuccess":true,"message":"返回成功","success":true,"systemTime":"2019-07-30 16:24:44"}');
-  const interfaceList = [];
+  const paramsInterfaceList = [];
+  const resultInterfaceList = [];
   return new Promise((resolve, reject) => {
     try {
-      buildInterfaceList(apiSettings.apiParam, 'Param', interfaceList);
-      buildInterfaceList(apiSettings.apiResult, `${apiSettings.apiFileName}Result`, interfaceList, true);
+      buildInterfaceList(apiSettings.apiParam, 'Param', paramsInterfaceList);
+      buildInterfaceList(apiSettings.apiResult, `${apiSettings.apiFileName}Result`, resultInterfaceList, true);
 
       const apiTpl = FS.readFileSync(API_MUSTACHE, { encoding: 'utf8' });
-      const fileContent = Mustache.render(apiTpl, { interfaceList, ...apiSettings });
+      const fileContent = Mustache.render(apiTpl, {
+        paramsInterfaceList,
+        resultInterfaceList,
+        moreIndent: apiSettings.codeIndent === 4,
+        ...apiSettings,
+      });
 
       const jsonFile = FS.createWriteStream(`${apiSettings.outputPath}/${apiSettings.apiFileName}.ts`, {
         flags: 'w',
@@ -69,7 +77,7 @@ exports.generateApi = (apiSettings) => {
       });
       jsonFile.write(fileContent);
       jsonFile.end();
-      resolve(interfaceList);
+      resolve(paramsInterfaceList.concat(resultInterfaceList));
     } catch (error) {
       reject(error);
     }

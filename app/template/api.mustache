@@ -1,31 +1,37 @@
-// Auto Generated.  DO NOT EDIT!
 /* eslint-disable no-trailing-spaces, max-len, camelcase */
 
 export class {{apiFileName}} {
-  method: string;
+  {{#moreIndent}}  {{/moreIndent}}method: string;
 
-  url: string;
+  {{#moreIndent}}  {{/moreIndent}}url: string;
 
-  localUrl: string;
+  {{#moreIndent}}  {{/moreIndent}}localUrl: string;
 
-  mockUrl: string;
+  {{#moreIndent}}  {{/moreIndent}}mockUrl: string;
 
-  body: any;
+  {{#moreIndent}}  {{/moreIndent}}body: any;
 
-  constructor(params: Param) {
-    this.method = '{{method}}';
-    this.url = '{{{url}}}';
-    this.localUrl = '{{{localUrl}}}';
-    this.mockUrl = '{{{mockUrl}}}';
-    this.body = params;
-  }
+  {{#moreIndent}}  {{/moreIndent}}constructor(params: Param) {
+    {{#moreIndent}}    {{/moreIndent}}this.method = '{{method}}';
+    {{#moreIndent}}    {{/moreIndent}}this.url = '{{{url}}}';
+    {{#moreIndent}}    {{/moreIndent}}this.localUrl = '{{{localUrl}}}';
+    {{#moreIndent}}    {{/moreIndent}}this.mockUrl = '{{{mockUrl}}}';
+    {{#moreIndent}}    {{/moreIndent}}this.body = params;
+  {{#moreIndent}}  {{/moreIndent}}}
 }
 export default {{apiFileName}};
 
-{{#interfaceList}}
-{{#isRes}}export {{/isRes}}interface {{interfaceName}} {
+{{#paramsInterfaceList}}
+interface {{interfaceName}} {
   {{#fieldList}}
-  {{key}}: {{type}};
+  {{#moreIndent}}  {{/moreIndent}}{{key}}{{#isOptional}}?{{/isOptional}}: {{type}};
   {{/fieldList}}
 }
-{{/interfaceList}}
+{{/paramsInterfaceList}}
+{{#resultInterfaceList}}
+{{#isResultType}}export {{/isResultType}}interface {{interfaceName}} {
+  {{#fieldList}}
+  {{#moreIndent}}  {{/moreIndent}}{{key}}?: {{type}};
+  {{/fieldList}}
+}
+{{/resultInterfaceList}}

@@ -59,22 +59,30 @@
           <div class="row">
             <el-button @click="selectSearchFolder" onfocus="blur()">选择</el-button>
             <div class="flex-1 output-folder-path">{{apiForm.outputPath}}</div>
+            <span class="span-margin">代码缩进格式</span>
+            <el-radio-group v-model="apiForm.codeIndent" size="small">
+              <el-radio-button :label="2">2</el-radio-button>
+              <el-radio-button :label="4">4</el-radio-button>
+            </el-radio-group>
           </div>
         </el-form-item>
         <el-form-item label="文件名">
-          <el-radio v-model="apiForm.fileNameType" label="1">
-            <div class="file-name-text">{{fileNameByUrl}}</div>
-          </el-radio>
-          <el-radio v-model="apiForm.fileNameType" label="2">
-            <el-input
-              class="file-name-text"
-              placeholder="自定义接口文件名"
-              v-model="apiForm.fileName"
-              :disabled="apiForm.fileNameType === '1'"
-            ></el-input>
-          </el-radio>
-          <el-button class="action-button" type="primary" @click="run">生成接口文件</el-button>
-          <el-button class="action-button" @click="resetForm">清空表单</el-button>
+          <div class="row align-items-center">
+            <el-radio v-model="apiForm.fileNameType" label="1">
+              <div class="file-name-text">{{fileNameByUrl}}</div>
+            </el-radio>
+            <el-radio v-model="apiForm.fileNameType" label="2">
+              <el-input
+                class="file-name-text"
+                placeholder="自定义接口文件名"
+                v-model="apiForm.fileName"
+                :disabled="apiForm.fileNameType === '1'"
+              ></el-input>
+            </el-radio>
+            <div class="flex-1"></div>
+            <el-button class="action-button" type="primary" @click="run">生成接口文件</el-button>
+            <el-button class="action-button" @click="resetForm">清空表单</el-button>
+          </div>
         </el-form-item>
       </el-form>
     </div>
@@ -97,6 +105,7 @@ export default Vue.extend({
       },
       apiForm: {
         method: 'post',
+        codeIndent: 2,
         url: '',
         localUrl: '',
         mockUrl: '',
@@ -168,6 +177,9 @@ export default Vue.extend({
 }
 .main {
   padding-right: 45px;
+}
+.span-margin {
+  margin: 0 20px 0 70px;
 }
 .data-json-text {
   &-param {

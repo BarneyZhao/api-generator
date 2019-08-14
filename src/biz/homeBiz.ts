@@ -3,7 +3,6 @@ import eu from '../utils/electronUtils';
 export function generateApiFile(apiSettings: any) {
   const params = apiSettings;
   try {
-    debugger;
     params.apiParam = JSON.parse(apiSettings.apiParam || '{}');
     params.apiResult = JSON.parse(apiSettings.apiResult);
   } catch (error) {
