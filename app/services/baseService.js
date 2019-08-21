@@ -30,13 +30,18 @@ const buildInterfaceList = (obj, interfaceName, interfaceList, isResultType) => 
         break;
       case ARRAY:
         arrItemType = Object.prototype.toString.call(value[0]);
-        if (arrItemType === NULL || arrItemType === UNDEFINED) throw new Error(`数组${key}为空或item为Null/Undefined`);
         if (arrItemType === ARRAY) throw new Error(`暂不支持多维数组[${key}]`);
 
-        if (arrItemType === NUMBER) field.type = 'number[]';
-        else if (arrItemType === STRING) field.type = 'string[]';
-        else if (arrItemType === BOOLEAN) field.type = 'boolean[]';
-        else {
+        if (arrItemType === NULL || arrItemType === UNDEFINED) {
+          // throw new Error(`数组${key}为空或item为Null/Undefined`);
+          field.type = 'any[]';
+        } else if (arrItemType === NUMBER) {
+          field.type = 'number[]';
+        } else if (arrItemType === STRING) {
+          field.type = 'string[]';
+        } else if (arrItemType === BOOLEAN) {
+          field.type = 'boolean[]';
+        } else {
           field.type = `${interfaceName}$${key}[]`;
           buildInterfaceList(value[0], `${interfaceName}$${key}`, interfaceList);
         }
@@ -46,6 +51,8 @@ const buildInterfaceList = (obj, interfaceName, interfaceList, isResultType) => 
         buildInterfaceList(value, field.type, interfaceList);
         break;
       default:
+        // NULL 和 UNDEFINED 的情况
+        field.type = 'any';
         break;
     }
     resultObj.fieldList.push(field);
