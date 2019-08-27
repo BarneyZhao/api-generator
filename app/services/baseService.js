@@ -11,8 +11,8 @@ const OBJECT = '[object Object]';
 const NULL = '[object Null]';
 const UNDEFINED = '[object Undefined]';
 
-const buildInterfaceList = (obj, interfaceName, interfaceList, isResultType) => {
-  const resultObj = { interfaceName, fieldList: [], isResultType };
+const buildInterfaceList = (obj, interfaceName, interfaceList, isExport) => {
+  const resultObj = { interfaceName, fieldList: [], isExport };
   Object.entries(obj).forEach(([key, value]) => {
     const field = { key, type: '', isOptional: false };
     let arrItemType = '';
@@ -67,7 +67,7 @@ exports.generateApi = (apiSettings) => {
   const resultInterfaceList = [];
   return new Promise((resolve, reject) => {
     try {
-      buildInterfaceList(apiSettings.apiParam, 'Param', paramsInterfaceList);
+      buildInterfaceList(apiSettings.apiParam, `${apiSettings.apiFileName}Param`, paramsInterfaceList, true);
       buildInterfaceList(apiSettings.apiResult, `${apiSettings.apiFileName}Result`, resultInterfaceList, true);
 
       const apiTpl = FS.readFileSync(API_MUSTACHE, { encoding: 'utf8' });

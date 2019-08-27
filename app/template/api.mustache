@@ -1,35 +1,50 @@
 /* eslint-disable no-trailing-spaces, max-len, camelcase */
+import Api from './Api';
+import { rootPathBj } from '../services/xhr/config';
 
-export class {{apiFileName}} {
-  {{#moreIndent}}  {{/moreIndent}}method: string;
-
-  {{#moreIndent}}  {{/moreIndent}}url: string;
-
-  {{#moreIndent}}  {{/moreIndent}}localUrl: string;
-
-  {{#moreIndent}}  {{/moreIndent}}mockUrl: string;
-
-  {{#moreIndent}}  {{/moreIndent}}body: any;
-
-  {{#moreIndent}}  {{/moreIndent}}constructor(params: Param) {
-    {{#moreIndent}}    {{/moreIndent}}this.method = '{{method}}';
-    {{#moreIndent}}    {{/moreIndent}}this.url = '{{{url}}}';
-    {{#moreIndent}}    {{/moreIndent}}this.localUrl = '{{{localUrl}}}';
-    {{#moreIndent}}    {{/moreIndent}}this.mockUrl = '{{{mockUrl}}}';
-    {{#moreIndent}}    {{/moreIndent}}this.body = params;
-  {{#moreIndent}}  {{/moreIndent}}}
+export class {{apiFileName}} extends Api {
+  {{#moreIndent}}
+    constructor(params: {{apiFileName}}Param) {
+        super({
+            method: '{{method}}',
+            url: `${rootPathBj}{{{url}}}`,
+            {{#localUrl}}
+            localUrl: '{{{localUrl}}}',
+            {{/localUrl}}
+            {{#mockUrl}}
+            mockUrl: '{{{mockUrl}}}',
+            {{/mockUrl}}
+            body: params,
+        });
+    }
+  {{/moreIndent}}
+  {{^moreIndent}}
+  constructor(params: {{apiFileName}}Param) {
+    super({
+      method: '{{method}}',
+      url: `${rootPathBj}{{{url}}}`,
+      {{#localUrl}}
+      localUrl: '{{{localUrl}}}',
+      {{/localUrl}}
+      {{#mockUrl}}
+      mockUrl: '{{{mockUrl}}}',
+      {{/mockUrl}}
+      body: params,
+    });
+  }
+  {{/moreIndent}}
 }
 export default {{apiFileName}};
 
 {{#paramsInterfaceList}}
-interface {{interfaceName}} {
+{{#isExport}}export {{/isExport}}interface {{interfaceName}} {
   {{#fieldList}}
   {{#moreIndent}}  {{/moreIndent}}{{key}}{{#isOptional}}?{{/isOptional}}: {{type}};
   {{/fieldList}}
 }
 {{/paramsInterfaceList}}
 {{#resultInterfaceList}}
-{{#isResultType}}export {{/isResultType}}interface {{interfaceName}} {
+{{#isExport}}export {{/isExport}}interface {{interfaceName}} {
   {{#fieldList}}
   {{#moreIndent}}  {{/moreIndent}}{{key}}?: {{type}};
   {{/fieldList}}
