@@ -4,7 +4,7 @@ import { rootPathBj } from '../services/xhr/config';
 
 export class {{apiFileName}} extends Api {
   {{#moreIndent}}
-    meta: any;
+    resultMeta: any;
 
     constructor(params: {{paramInterface}}) {
         super({
@@ -18,11 +18,11 @@ export class {{apiFileName}} extends Api {
             {{/mockUrl}}
             body: params,
         });
-        this.meta = {{resultMeta}};
+        this.resultMeta = {{resultMeta}};
     }
   {{/moreIndent}}
   {{^moreIndent}}
-  meta: any;
+  resultMeta: any;
 
   constructor(params: {{paramInterface}}) {
     super({
@@ -36,7 +36,7 @@ export class {{apiFileName}} extends Api {
       {{/mockUrl}}
       body: params,
     });
-    this.meta = {{resultMeta}};
+    this.resultMeta = {{resultMeta}};
   }
   {{/moreIndent}}
 }
