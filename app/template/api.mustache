@@ -4,8 +4,6 @@ import { rootPathBj } from '../services/xhr/config';
 
 export class {{apiFileName}} extends Api {
   {{#moreIndent}}
-    resultMeta: any;
-
     constructor(params: {{paramInterface}}) {
         super({
             method: '{{method}}',
@@ -17,13 +15,11 @@ export class {{apiFileName}} extends Api {
             mockUrl: '{{{mockUrl}}}',
             {{/mockUrl}}
             body: params,
+            resultMeta: {{resultMeta}},
         });
-        this.resultMeta = {{resultMeta}};
     }
   {{/moreIndent}}
   {{^moreIndent}}
-  resultMeta: any;
-
   constructor(params: {{paramInterface}}) {
     super({
       method: '{{method}}',
@@ -35,8 +31,8 @@ export class {{apiFileName}} extends Api {
       mockUrl: '{{{mockUrl}}}',
       {{/mockUrl}}
       body: params,
+      resultMeta: {{resultMeta}},
     });
-    this.resultMeta = {{resultMeta}};
   }
   {{/moreIndent}}
 }
