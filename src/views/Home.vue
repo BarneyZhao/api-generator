@@ -61,8 +61,8 @@
             <div class="flex-1 output-folder-path">{{apiForm.outputPath}}</div>
             <span class="span-margin">代码缩进格式</span>
             <el-radio-group v-model="apiForm.codeIndent" size="small">
-              <el-radio-button :label="2">2</el-radio-button>
               <el-radio-button :label="4">4</el-radio-button>
+              <el-radio-button :label="2">2</el-radio-button>
             </el-radio-group>
           </div>
         </el-form-item>
@@ -105,7 +105,7 @@ export default Vue.extend({
       },
       apiForm: {
         method: 'post',
-        codeIndent: 2,
+        codeIndent: 4,
         url: '',
         localUrl: '',
         mockUrl: '',

@@ -1,10 +1,12 @@
-/* eslint-disable no-trailing-spaces, max-len, camelcase */
+/* eslint-disable no-trailing-spaces, max-len, camelcase, no-use-before-define */
 import Api from './Api';
 import { rootPathBj } from '../services/xhr/config';
 
 export class {{apiFileName}} extends Api {
   {{#moreIndent}}
-    constructor(params: {{apiFileName}}Param) {
+    meta: any;
+
+    constructor(params: {{paramInterface}}) {
         super({
             method: '{{method}}',
             url: `${rootPathBj}{{{url}}}`,
@@ -16,10 +18,13 @@ export class {{apiFileName}} extends Api {
             {{/mockUrl}}
             body: params,
         });
+        this.meta = {{resultMeta}};
     }
   {{/moreIndent}}
   {{^moreIndent}}
-  constructor(params: {{apiFileName}}Param) {
+  meta: any;
+
+  constructor(params: {{paramInterface}}) {
     super({
       method: '{{method}}',
       url: `${rootPathBj}{{{url}}}`,
@@ -31,6 +36,7 @@ export class {{apiFileName}} extends Api {
       {{/mockUrl}}
       body: params,
     });
+    this.meta = {{resultMeta}};
   }
   {{/moreIndent}}
 }
@@ -46,7 +52,16 @@ export default {{apiFileName}};
 {{#resultInterfaceList}}
 {{#isExport}}export {{/isExport}}interface {{interfaceName}} {
   {{#fieldList}}
-  {{#moreIndent}}  {{/moreIndent}}{{key}}?: {{type}};
+  {{#moreIndent}}  {{/moreIndent}}{{key}}: {{type}};
   {{/fieldList}}
 }
+{{#isExport}}export {{/isExport}}const {{metaName}} = {
+  {{#fieldList}}
+  {{#moreIndent}}  {{/moreIndent}}{{key}}: {{{val}}},
+  {{/fieldList}}
+};
 {{/resultInterfaceList}}
+
+// 生成此文件所使用的 json 数据, 方便再次修改生成
+// param json: {{{apiParamJSON}}}
+// result json: {{{apiResultJSON}}}
