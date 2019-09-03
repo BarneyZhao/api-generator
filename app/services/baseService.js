@@ -72,6 +72,10 @@ const buildInterfaceList = (obj, interfaceName, interfaceList, isExport) => {
   interfaceList.push(resultObj);
 };
 
+exports.checkFileExist = filePath => new Promise((resolve, reject) => {
+  resolve(FS.existsSync(filePath));
+});
+
 exports.generateApi = (apiSettings) => {
   const paramsInterfaceList = [];
   const resultInterfaceList = [];
@@ -94,7 +98,7 @@ exports.generateApi = (apiSettings) => {
         ...apiSettings,
       });
 
-      const jsonFile = FS.createWriteStream(`${apiSettings.outputPath}/${apiSettings.apiFileName}.ts`, {
+      const jsonFile = FS.createWriteStream(apiSettings.apiFilePath, {
         flags: 'w',
         defaultEncoding: 'utf8',
       });

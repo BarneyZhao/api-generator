@@ -131,7 +131,7 @@ export default Vue.extend({
   methods: {
     run() {
       const that = this;
-      (this.$refs.apiForm as any).validate((valid: boolean) => {
+      (this.$refs.apiForm as any).validate(async (valid: boolean) => {
         if (valid) {
           if (!that.apiForm.outputPath) {
             that.$notify.warning('请选择文件生成路径');
@@ -139,12 +139,27 @@ export default Vue.extend({
             that.$notify.error('接口结果 JSON 不能为空');
           } else {
             const apiFileName = that.apiForm.fileNameType === '1' ? that.fileNameByUrl : that.apiForm.fileName;
-            biz.generateApiFile({ apiFileName, ...that.apiForm }).then((data: any) => {
-              if (!data.err) that.$notify.success(`文件${apiFileName}.ts生成成功！`);
-              else that.$notify.error(data.err.message || data.err);
-            }).catch((err) => {
-              that.$notify.error(err.message || err);
+            const apiFilePath = `${that.apiForm.outputPath}/${apiFileName}.ts`;
+            const flag = await biz.checkFile(apiFilePath).then((isFileExist) => {
+              if (isFileExist) {
+                return that.$confirm(`文件 ${apiFileName}.ts 已存在, 重新生成将覆盖原文件, 是否继续?`, '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning',
+                }).then(() => true).catch(() => false);
+              }
+              return true;
             });
+            if (flag) {
+              biz.generateApiFile({
+                apiFileName, apiFilePath, ...that.apiForm,
+              }).then((data: any) => {
+                if (!data.err) that.$notify.success(`文件 ${apiFileName}.ts 生成成功！`);
+                else that.$notify.error(data.err.message || data.err);
+              }).catch((err) => {
+                that.$notify.error(err.message || err);
+              });
+            }
           }
         }
       });

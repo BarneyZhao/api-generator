@@ -1,5 +1,9 @@
 import eu from '../utils/electronUtils';
 
+export function checkFile(filePath: string) {
+  return eu.req({ name: 'checkFileExist', params: filePath });
+}
+
 export function generateApiFile(apiSettings: any) {
   const params = apiSettings;
   try {

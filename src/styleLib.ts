@@ -11,6 +11,7 @@ import {
   RadioGroup,
   RadioButton,
   Notification,
+  MessageBox,
 } from 'element-ui';
 
 Vue.use(Input);
@@ -21,5 +22,5 @@ Vue.use(Radio);
 Vue.use(RadioGroup);
 Vue.use(RadioButton);
 
-
 Vue.prototype.$notify = Notification;
+Vue.prototype.$confirm = MessageBox.confirm;

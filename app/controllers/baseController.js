@@ -6,3 +6,4 @@ const ipc = require(`${app.getAppPath()}/app/utils/ipc.js`);
 const service = require(`${app.getAppPath()}/app/services/baseService.js`);
 
 ipc.on('generateApi', service.generateApi);
+ipc.on('checkFileExist', service.checkFileExist);
