@@ -14,14 +14,17 @@
             <el-radio-button label="get">GET</el-radio-button>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="wikiUrl" prop="wikiUrl">
+          <el-input v-model="apiForm.wikiUrl" @blur="checkApiWiki"></el-input>
+        </el-form-item>
+        <el-form-item label="wikiCookie" prop="wikiCookie">
+          <el-input v-model="apiForm.wikiCookie" @blur="checkApiWiki"></el-input>
+        </el-form-item>
+        <el-form-item label="title" prop="title">
+          <el-input v-model="apiForm.title" v-loading="wikiLoading"></el-input>
+        </el-form-item>
         <el-form-item label="url" prop="url">
-          <el-input v-model="apiForm.url"></el-input>
-        </el-form-item>
-        <el-form-item label="localUrl" prop="localUrl">
-          <el-input v-model="apiForm.localUrl"></el-input>
-        </el-form-item>
-        <el-form-item label="mockUrl" prop="mockUrl">
-          <el-input v-model="apiForm.mockUrl"></el-input>
+          <el-input v-model="apiForm.url" v-loading="wikiLoading"></el-input>
         </el-form-item>
         <el-form-item>
           <div class="row">
@@ -98,6 +101,7 @@ export default Vue.extend({
   name: 'home',
   data() {
     return {
+      wikiLoading: false,
       apiFormRules: {
         url: [
           { required: true, message: '请输入url', trigger: 'blur' },
@@ -106,9 +110,10 @@ export default Vue.extend({
       apiForm: {
         method: 'post',
         codeIndent: 4,
+        wikiUrl: '',
+        wikiCookie: '',
+        title: '',
         url: '',
-        localUrl: '',
-        mockUrl: '',
         apiParam: '',
         apiResult: '',
         outputPath: '',
@@ -129,6 +134,25 @@ export default Vue.extend({
     },
   },
   methods: {
+    checkApiWiki() {
+      if (this.apiForm.wikiUrl && this.apiForm.wikiCookie) {
+        this.wikiLoading = true;
+        const that = this;
+        biz.getApiInfo(this.apiForm.wikiUrl, this.apiForm.wikiCookie).then((res: any) => {
+          if (!res.isError) {
+            that.apiForm.title = res.apiTitle;
+            if (res.apiUrl) that.apiForm.url = res.apiUrl;
+            else that.$notify.error('wiki 解析 apiUrl 失败, 请手动填写 url');
+          } else {
+            that.$notify.error(`wiki 解析失败: ${res.message}`);
+          }
+        }).catch((err) => {
+          that.$notify.error(err.message || err);
+        }).finally(() => {
+          that.wikiLoading = false;
+        });
+      }
+    },
     run() {
       const that = this;
       (this.$refs.apiForm as any).validate(async (valid: boolean) => {

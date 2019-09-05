@@ -1,5 +1,9 @@
 import eu from '../utils/electronUtils';
 
+export function getApiInfo(wikiUrl: string, wikiCookie: string) {
+  return eu.req({ name: 'getApiInfoFromWiki', params: { url: wikiUrl, cookie: wikiCookie } });
+}
+
 export function checkFile(filePath: string) {
   return eu.req({ name: 'checkFileExist', params: filePath });
 }

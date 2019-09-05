@@ -7,3 +7,4 @@ const service = require(`${app.getAppPath()}/app/services/baseService.js`);
 
 ipc.on('generateApi', service.generateApi);
 ipc.on('checkFileExist', service.checkFileExist);
+ipc.on('getApiInfoFromWiki', service.getApiInfoFromWiki);

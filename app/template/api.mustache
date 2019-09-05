@@ -1,7 +1,13 @@
 /* eslint-disable no-trailing-spaces, max-len, camelcase, no-use-before-define */
 import Api from './Api';
 import { rootPathBj } from '../services/xhr/config';
-
+/**
+ * {{{title}}}
+ * wiki: {{{wikiUrl}}}
+ * @export
+ * @class {{apiFileName}}
+ * @extends {Api}
+ */
 export class {{apiFileName}} extends Api {
   {{#moreIndent}}
     constructor(params: {{paramInterface}}) {

@@ -4,9 +4,9 @@ const { app } = require('electron');
 const config = {
   WINDOW_OPS: {
     width: 1280,
-    height: 744,
+    height: 806,
     minWidth: 1280,
-    minHeight: 744,
+    minHeight: 806,
     title: 'api-generator',
     webPreferences: {
       nodeIntegration: true,

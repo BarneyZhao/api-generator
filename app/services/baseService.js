@@ -1,5 +1,7 @@
 const FS = require('fs');
 const Mustache = require('mustache');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 const API_MUSTACHE = `${__dirname}/../template/api.mustache`;
 
@@ -70,6 +72,32 @@ const buildInterfaceList = (obj, interfaceName, interfaceList, isExport) => {
     resultObj.fieldList.push(field);
   });
   interfaceList.push(resultObj);
+};
+
+exports.getApiInfoFromWiki = async ({ url, cookie }) => {
+  const response = await axios({
+    method: 'get',
+    url,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      Origin: 'https://cf.jd.com',
+      Referer: 'https://cf.jd.com/',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+      Cookie: `JSESSIONID=${cookie}`,
+    },
+  }).catch((err) => {
+    console.log(err);
+    return { data: { isError: true, message: 'axios 调用错误' } };
+  });
+  if (response.data.isError) return response.data;
+  const $ = cheerio.load(response.data, { decodeEntities: false });
+  console.log($('title').text());
+  const apiUrl = $('h1').filter((i, el) => $(el).text() === '接口定义').next().children().text();
+  console.log(apiUrl);
+  return {
+    apiTitle: $('title').text(),
+    apiUrl: apiUrl && apiUrl.replace(/(https?:\/\/)?mac.jd.com/, ''),
+  };
 };
 
 exports.checkFileExist = filePath => new Promise((resolve, reject) => {

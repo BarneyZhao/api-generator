@@ -12,6 +12,7 @@ import {
   RadioButton,
   Notification,
   MessageBox,
+  Loading,
 } from 'element-ui';
 
 Vue.use(Input);
@@ -21,6 +22,7 @@ Vue.use(FormItem);
 Vue.use(Radio);
 Vue.use(RadioGroup);
 Vue.use(RadioButton);
+Vue.use(Loading.directive);
 
 Vue.prototype.$notify = Notification;
 Vue.prototype.$confirm = MessageBox.confirm;
