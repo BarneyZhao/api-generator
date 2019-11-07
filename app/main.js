@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies, import/no-dynamic-require */
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu } = require('electron');
-const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
+// const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
 
 const mainConfig = require(`${app.getAppPath()}/app/main_config.js`);
 
@@ -31,7 +31,7 @@ const createWindow = async () => {
 
   // Open the DevTools.
   if (isDev) {
-    await installExtension(VUEJS_DEVTOOLS);
+    // await installExtension(VUEJS_DEVTOOLS);
     mainWindow.webContents.openDevTools();
   }
 };

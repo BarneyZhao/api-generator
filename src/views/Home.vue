@@ -29,7 +29,7 @@
         <el-form-item>
           <div class="row">
             <div class="col data-json-text-param">
-              <div>接口入参 JSON</div>
+              <div>接口入参</div>
               <el-input
                 :class="{
                   'valid-border': apiForm.apiParam && paramJsonValid,
@@ -38,12 +38,13 @@
                 type="textarea"
                 :rows="10"
                 resize="none"
-                placeholder="请输入内容"
+                placeholder="请输入 JSON 串或 JS Object(失焦时转换为 JSON 串)"
+                @blur="transformJsObj('apiParam')"
                 v-model="apiForm.apiParam">
               </el-input>
             </div>
             <div class="col data-json-text-result">
-              <div>接口结果 JSON</div>
+              <div>接口结果</div>
               <el-input
                 :class="{
                   'valid-border': apiForm.apiResult && resultJsonValid,
@@ -52,7 +53,8 @@
                 type="textarea"
                 :rows="10"
                 resize="none"
-                placeholder="请输入内容"
+                placeholder="请输入 JSON 串或 JS Object(失焦时转换为 JSON 串)"
+                @blur="transformJsObj('apiResult')"
                 v-model="apiForm.apiResult">
               </el-input>
             </div>
@@ -127,10 +129,10 @@ export default Vue.extend({
       return this.apiForm.url && getFileNameByUrl(this.apiForm.url);
     },
     paramJsonValid(): boolean {
-      return !!this.apiForm.apiParam && isJSON(this.apiForm.apiParam);
+      return Boolean(this.apiForm.apiParam) && isJSON(this.apiForm.apiParam);
     },
     resultJsonValid(): boolean {
-      return !!this.apiForm.apiResult && isJSON(this.apiForm.apiResult);
+      return Boolean(this.apiForm.apiResult) && isJSON(this.apiForm.apiResult);
     },
   },
   methods: {
@@ -151,6 +153,18 @@ export default Vue.extend({
         }).finally(() => {
           that.wikiLoading = false;
         });
+      }
+    },
+    transformJsObj(valName: 'apiParam' | 'apiResult') {
+      try {
+        // eslint-disable-next-line prefer-const
+        let temp = '';
+        // eslint-disable-next-line no-eval
+        eval(`temp = ${this.apiForm[valName]}`);
+        if (temp) this.apiForm[valName] = JSON.stringify(temp);
+        console.log('transformJsObj: ', temp);
+      } catch (error) {
+        console.log('transformJsObj err: ', this.apiForm[valName]);
       }
     },
     run() {
