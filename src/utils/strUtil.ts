@@ -1,7 +1,10 @@
+export const urlReg = /\{(.+?)\}/g;
+
 export function getFileNameByUrl(url: string) {
   let pureUrl = url;
   if (url.includes('?')) pureUrl = url.slice(0, url.lastIndexOf('?'));
-  const strArr = pureUrl.split('/');
+  pureUrl = pureUrl.replace(urlReg, ''); // 大括号
+  const strArr = pureUrl.split('/').filter(Boolean);
   const resultArr: string[] = [];
   strArr.forEach((s) => {
     if (s) resultArr.push(s.slice(0, 1).toUpperCase() + s.slice(1, s.length));

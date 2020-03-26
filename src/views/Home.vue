@@ -24,7 +24,7 @@
           <el-input v-model="apiForm.title" v-loading="wikiLoading"></el-input>
         </el-form-item>
         <el-form-item label="url" prop="url">
-          <el-input v-model="apiForm.url" v-loading="wikiLoading"></el-input>
+          <el-input v-model="apiForm.url" v-loading="wikiLoading" @blur="checkUrlParams"></el-input>
         </el-form-item>
         <el-form-item>
           <div class="row">
@@ -40,7 +40,8 @@
                 resize="none"
                 placeholder="请输入 JSON 串或 JS Object(失焦时转换为 JSON 串)"
                 @blur="transformJsObj('apiParam')"
-                v-model="apiForm.apiParam">
+                v-model="apiForm.apiParam"
+                :disabled="apiForm.method === 'get'">
               </el-input>
             </div>
             <div class="col data-json-text-result">
@@ -96,7 +97,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getFileNameByUrl, isJSON } from '../utils/strUtil';
+import { getFileNameByUrl, isJSON, urlReg } from '../utils/strUtil';
 import * as biz from '../biz/homeBiz';
 
 export default Vue.extend({
@@ -143,8 +144,10 @@ export default Vue.extend({
         biz.getApiInfo(this.apiForm.wikiUrl, this.apiForm.wikiCookie).then((res: any) => {
           if (!res.isError) {
             that.apiForm.title = res.apiTitle;
-            if (res.apiUrl) that.apiForm.url = res.apiUrl;
-            else that.$notify.error('wiki 解析 apiUrl 失败, 请手动填写 url');
+            if (res.apiUrl) {
+              that.apiForm.url = res.apiUrl;
+              that.checkUrlParams();
+            } else that.$notify.error('wiki 解析 apiUrl 失败, 请手动填写 url');
           } else {
             that.$notify.error(`wiki 解析失败: ${res.message}`);
           }
@@ -154,6 +157,16 @@ export default Vue.extend({
           that.wikiLoading = false;
         });
       }
+    },
+    checkUrlParams() {
+      const matchArr: string[] = Array.from(this.apiForm.url.match(urlReg) || []);
+      if (matchArr.length === 0) return;
+      const paramJsonObj: any = {};
+      matchArr.forEach((param) => {
+        const paramStr = param.substring(1, param.length - 1);
+        paramJsonObj[paramStr] = 'string';
+      });
+      this.apiForm.apiParam = JSON.stringify(paramJsonObj);
     },
     transformJsObj(valName: 'apiParam' | 'apiResult') {
       try {

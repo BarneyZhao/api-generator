@@ -4,6 +4,8 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const API_MUSTACHE = `${__dirname}/../template/api.mustache`;
+const API_BASE_MUSTACHE = `${__dirname}/../template/api-base.mustache`;
+const REQUEST_MUSTACHE = `${__dirname}/../template/request.mustache`;
 
 const NUMBER = '[object Number]';
 const STRING = '[object String]';
@@ -12,6 +14,32 @@ const ARRAY = '[object Array]';
 const OBJECT = '[object Object]';
 const NULL = '[object Null]';
 const UNDEFINED = '[object Undefined]';
+
+const checkFileExist = filePath => new Promise((resolve, reject) => {
+  resolve(FS.existsSync(filePath));
+});
+
+const readTempAndWriteFile = (template, filePath, tempObj = {}) => {
+  const tpl = FS.readFileSync(template, { encoding: 'utf8' });
+  const fileContent = Mustache.render(tpl, tempObj);
+
+  const jsonFile = FS.createWriteStream(filePath, {
+    flags: 'w',
+    defaultEncoding: 'utf8',
+  });
+  jsonFile.write(fileContent);
+  jsonFile.end();
+};
+
+const checkApiBaseFile = async (outputPath) => {
+  const apiBaseFilePath = `${outputPath}/Api.ts`;
+  const requestFilePath = `${outputPath}/request.ts`;
+  const flag = await checkFileExist(apiBaseFilePath);
+  if (!flag) {
+    readTempAndWriteFile(API_BASE_MUSTACHE, apiBaseFilePath);
+    readTempAndWriteFile(REQUEST_MUSTACHE, requestFilePath);
+  }
+};
 
 const buildInterfaceList = (obj, interfaceName, interfaceList, isExport) => {
   const resultObj = {
@@ -74,6 +102,8 @@ const buildInterfaceList = (obj, interfaceName, interfaceList, isExport) => {
   interfaceList.push(resultObj);
 };
 
+exports.checkFileExist = checkFileExist;
+
 exports.getApiInfoFromWiki = async ({ url, cookie }) => {
   const response = await axios({
     method: 'get',
@@ -100,11 +130,9 @@ exports.getApiInfoFromWiki = async ({ url, cookie }) => {
   };
 };
 
-exports.checkFileExist = filePath => new Promise((resolve, reject) => {
-  resolve(FS.existsSync(filePath));
-});
-
 exports.generateApi = (apiSettings) => {
+  checkApiBaseFile(apiSettings.outputPath);
+
   const paramsInterfaceList = [];
   const resultInterfaceList = [];
   return new Promise((resolve, reject) => {
@@ -114,8 +142,13 @@ exports.generateApi = (apiSettings) => {
       buildInterfaceList(apiSettings.apiParam, paramInterface, paramsInterfaceList, true);
       buildInterfaceList(apiSettings.apiResult, resultInterface, resultInterfaceList, true);
 
-      const apiTpl = FS.readFileSync(API_MUSTACHE, { encoding: 'utf8' });
-      const fileContent = Mustache.render(apiTpl, {
+      //
+      const apiUrl = apiSettings.url.replace(/\{/g, '${params.');
+      Object.assign(apiSettings, {
+        url: apiUrl,
+      });
+
+      readTempAndWriteFile(API_MUSTACHE, apiSettings.apiFilePath, {
         paramsInterfaceList,
         resultInterfaceList,
         moreIndent: apiSettings.codeIndent === 4,
@@ -125,13 +158,6 @@ exports.generateApi = (apiSettings) => {
         apiResultJSON: JSON.stringify(apiSettings.apiResult),
         ...apiSettings,
       });
-
-      const jsonFile = FS.createWriteStream(apiSettings.apiFilePath, {
-        flags: 'w',
-        defaultEncoding: 'utf8',
-      });
-      jsonFile.write(fileContent);
-      jsonFile.end();
       resolve(paramsInterfaceList.concat(resultInterfaceList));
     } catch (error) {
       reject(error);

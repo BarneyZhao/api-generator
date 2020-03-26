@@ -1,0 +1,70 @@
+import Api from './Api';
+
+const env = 'dev'; // local | mock | dev | prod
+
+const ARRAY = '[object Array]';
+const OBJECT = '[object Object]';
+const NULL = '[object Null]';
+const UNDEFINED = '[object Undefined]';
+
+function parseData(metadata: any, resData: any, path = '') {
+    if (!metadata) return resData;
+    const metadataType = Object.prototype.toString.call(metadata);
+    const resDataType = Object.prototype.toString.call(resData);
+    const isResDataValid = resDataType !== NULL && resDataType !== UNDEFINED;
+    const isResDataFitMeta = metadataType === resDataType;
+    if (isResDataValid && !isResDataFitMeta && env !== 'prod') {
+        console.warn(`type not match! info : ${path} is ${resDataType} , [api].ts defined it is ${metadataType}`);
+    }
+    let returnData: any;
+    if (metadataType === ARRAY) {
+        if (isResDataFitMeta) {
+            returnData = resData.map((item: any, index: number) => parseData(metadata[0], item, `${path}[${index}]`));
+        } else if (isResDataValid) {
+            returnData = resData;
+        } else {
+            returnData = [];
+        }
+    } else if (metadataType === OBJECT) {
+        returnData = {};
+        if (isResDataFitMeta) {
+            Object.entries(resData).forEach(([key, val]) => {
+                if (metadata[key] === UNDEFINED && env !== 'prod') {
+                    console.warn(`${key} in ${path} is not defined in [api].ts`);
+                }
+                returnData[key] = parseData(metadata[key], val, `${path}['${key}']`);
+            });
+            // 反向检查 meta 里是否有 resData 没有的 key
+            Object.entries(metadata).forEach(([key, val]) => {
+                if (resData[key] === UNDEFINED && env !== 'prod') {
+                    console.warn(`${key} in meta but not in resData : ${path}`);
+                }
+            });
+        } else if (isResDataValid) {
+            returnData = resData;
+        }
+    } else {
+        returnData = resData || metadata;
+    }
+    return returnData;
+}
+
+export const request = <T>({ method = 'get', url, localUrl, mockUrl, body = null, resultMeta }: Api) => {
+    // 环境切换
+    let reqMethod = method;
+    let reqUrl = url;
+    if (env === 'local' && localUrl) {// 本地数据
+        reqMethod = 'get';
+        reqUrl = localUrl;
+    } else if (env === 'mock' && mockUrl) { // mock 数据
+        reqUrl = mockUrl;
+    }
+
+    return new Promise<T>((resolve, reject) => {
+        // axios().then(res => {
+        //     resolve(parseData(resultMeta, res.body, `${reqUrl} : `));
+        // })
+    });
+};
+
+export default request;

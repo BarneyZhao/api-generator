@@ -1,0 +1,28 @@
+/**
+ * api 基类
+ */
+export class Api {
+    method: 'get' | 'post';
+
+    url: string;
+
+    localUrl?: string;
+
+    mockUrl?: string;
+
+    body: any;
+
+    resultMeta: any;
+
+    constructor(api: Api) {
+        this.method = api.method;
+        this.url = api.url;
+        this.localUrl = api.localUrl || '';
+        this.mockUrl = api.mockUrl || '';
+        this.body = api.body;
+        this.resultMeta = api.resultMeta || null;
+    }
+}
+
+export default Api;
+
