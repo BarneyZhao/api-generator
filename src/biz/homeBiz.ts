@@ -27,3 +27,7 @@ export function selectFolder() {
     }, resolve);
   });
 }
+
+export function getTheFilePos(path?: string) {
+  return eu.req({ name: 'getFilePos', params: { path } });
+}

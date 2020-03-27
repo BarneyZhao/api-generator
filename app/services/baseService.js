@@ -2,6 +2,7 @@ const FS = require('fs');
 const Mustache = require('mustache');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const globby = require('globby');
 
 const API_MUSTACHE = `${__dirname}/../template/api.mustache`;
 const API_BASE_MUSTACHE = `${__dirname}/../template/api-base.mustache`;
@@ -142,8 +143,11 @@ exports.generateApi = (apiSettings) => {
       buildInterfaceList(apiSettings.apiParam, paramInterface, paramsInterfaceList, true);
       buildInterfaceList(apiSettings.apiResult, resultInterface, resultInterfaceList, true);
 
-      //
-      const apiUrl = apiSettings.url.replace(/\{/g, '${params.');
+      let apiUrl = apiSettings.url;
+      if (apiUrl.includes('?')) {
+        apiUrl = apiUrl.substring(0, apiUrl.indexOf('?'));
+      }
+      apiUrl = apiUrl.replace(/\{/g, '${params.');
       Object.assign(apiSettings, {
         url: apiUrl,
       });
@@ -163,4 +167,19 @@ exports.generateApi = (apiSettings) => {
       reject(error);
     }
   });
+};
+
+exports.getFilePos = async ({ path }) => {
+  const currentPath = path || process.cwd();
+  const listInPath = globby.sync(currentPath, {
+    onlyFiles: false, deep: 1, objectMode: true,
+  });
+  listInPath.forEach((pathObj) => {
+    Object.assign(pathObj, {
+      isDirectory: pathObj.dirent.isDirectory(),
+    });
+  });
+  return {
+    currentPath, listInPath,
+  };
 };

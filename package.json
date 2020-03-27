@@ -20,6 +20,7 @@
     "core-js": "^2.6.5",
     "element-ui": "^2.11.1",
     "express": "^4.17.1",
+    "globby": "^11.0.0",
     "mustache": "^3.0.1",
     "normalize.css": "^8.0.1",
     "vue": "^2.6.10",

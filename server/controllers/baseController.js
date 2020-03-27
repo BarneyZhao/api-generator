@@ -29,4 +29,13 @@ router.post('/api/getApiInfoFromWiki', (req, res) => {
   });
 });
 
+router.post('/api/getFilePos', (req, res) => {
+  baseService.getFilePos(req.body).then((data) => {
+    res.json(data);
+  }).catch((err) => {
+    console.log(err);
+    res.json(err.message || err);
+  });
+});
+
 module.exports = router;

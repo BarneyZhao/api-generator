@@ -10,6 +10,12 @@ import {
   Radio,
   RadioGroup,
   RadioButton,
+  Dialog,
+  Breadcrumb,
+  BreadcrumbItem,
+  Table,
+  TableColumn,
+  Icon,
   Notification,
   MessageBox,
   Loading,
@@ -22,6 +28,12 @@ Vue.use(FormItem);
 Vue.use(Radio);
 Vue.use(RadioGroup);
 Vue.use(RadioButton);
+Vue.use(Dialog);
+Vue.use(Breadcrumb);
+Vue.use(BreadcrumbItem);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(Icon);
 Vue.use(Loading.directive);
 
 Vue.prototype.$notify = Notification;

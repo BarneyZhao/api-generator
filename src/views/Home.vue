@@ -24,7 +24,7 @@
           <el-input v-model="apiForm.title" v-loading="wikiLoading"></el-input>
         </el-form-item>
         <el-form-item label="url" prop="url">
-          <el-input v-model="apiForm.url" v-loading="wikiLoading" @blur="checkUrlParams"></el-input>
+          <el-input v-model="apiForm.url" v-loading="wikiLoading"></el-input>
         </el-form-item>
         <el-form-item>
           <div class="row">
@@ -40,8 +40,7 @@
                 resize="none"
                 placeholder="请输入 JSON 串或 JS Object(失焦时转换为 JSON 串)"
                 @blur="transformJsObj('apiParam')"
-                v-model="apiForm.apiParam"
-                :disabled="apiForm.method === 'get'">
+                v-model="apiForm.apiParam">
               </el-input>
             </div>
             <div class="col data-json-text-result">
@@ -92,16 +91,24 @@
         </el-form-item>
       </el-form>
     </div>
+    <el-dialog
+      title="选择一个文件夹"
+      :visible.sync="FolderDialogVisible"
+    >
+      <FolderSelector @dialogCheck="folderSelectConfirm"></FolderSelector>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import FolderSelector from '@/components/FolderSelector.vue';
 import { getFileNameByUrl, isJSON, urlReg } from '../utils/strUtil';
 import * as biz from '../biz/homeBiz';
 
 export default Vue.extend({
   name: 'home',
+  components: { FolderSelector },
   data() {
     return {
       wikiLoading: false,
@@ -123,6 +130,7 @@ export default Vue.extend({
         fileNameType: '1',
         fileName: '',
       },
+      FolderDialogVisible: false,
     };
   },
   computed: {
@@ -146,7 +154,6 @@ export default Vue.extend({
             that.apiForm.title = res.apiTitle;
             if (res.apiUrl) {
               that.apiForm.url = res.apiUrl;
-              that.checkUrlParams();
             } else that.$notify.error('wiki 解析 apiUrl 失败, 请手动填写 url');
           } else {
             that.$notify.error(`wiki 解析失败: ${res.message}`);
@@ -157,16 +164,6 @@ export default Vue.extend({
           that.wikiLoading = false;
         });
       }
-    },
-    checkUrlParams() {
-      const matchArr: string[] = Array.from(this.apiForm.url.match(urlReg) || []);
-      if (matchArr.length === 0) return;
-      const paramJsonObj: any = {};
-      matchArr.forEach((param) => {
-        const paramStr = param.substring(1, param.length - 1);
-        paramJsonObj[paramStr] = 'string';
-      });
-      this.apiForm.apiParam = JSON.stringify(paramJsonObj);
     },
     transformJsObj(valName: 'apiParam' | 'apiResult') {
       try {
@@ -181,16 +178,17 @@ export default Vue.extend({
       }
     },
     run() {
+      const formObj = Object.assign({}, this.apiForm);
       const that = this;
       (this.$refs.apiForm as any).validate(async (valid: boolean) => {
         if (valid) {
-          if (!that.apiForm.outputPath) {
+          if (!formObj.outputPath) {
             that.$notify.warning('请选择文件生成路径');
-          } else if (!that.apiForm.apiResult) {
+          } else if (!formObj.apiResult) {
             that.$notify.error('接口结果 JSON 不能为空');
           } else {
-            const apiFileName = that.apiForm.fileNameType === '1' ? that.fileNameByUrl : that.apiForm.fileName;
-            const apiFilePath = `${that.apiForm.outputPath}/${apiFileName}.ts`;
+            const apiFileName = formObj.fileNameType === '1' ? that.fileNameByUrl : formObj.fileName;
+            const apiFilePath = `${formObj.outputPath}/${apiFileName}.ts`;
             const flag = await biz.checkFile(apiFilePath).then((isFileExist) => {
               if (isFileExist) {
                 return that.$confirm(`文件 ${apiFileName}.ts 已存在, 重新生成将覆盖原文件, 是否继续?`, '提示', {
@@ -202,8 +200,18 @@ export default Vue.extend({
               return true;
             });
             if (flag) {
+              // 将url中的大括号参数也转换到apiParam中
+              const matchArr: string[] = Array.from(formObj.url.match(urlReg) || []);
+              if (matchArr.length !== 0) {
+                const apiParamObj = formObj.apiParam ? JSON.parse(formObj.apiParam) : {};
+                matchArr.forEach((param) => {
+                  const paramStr = param.substring(1, param.length - 1);
+                  apiParamObj[paramStr] = 'string';
+                });
+                formObj.apiParam = JSON.stringify(apiParamObj);
+              }
               biz.generateApiFile({
-                apiFileName, apiFilePath, ...that.apiForm,
+                apiFileName, apiFilePath, ...formObj,
               }).then((data: any) => {
                 if (!data.err) that.$notify.success(`文件 ${apiFileName}.ts 生成成功！`);
                 else that.$notify.error(data.err.message || data.err);
@@ -221,9 +229,19 @@ export default Vue.extend({
       this.apiForm.apiResult = '';
     },
     selectSearchFolder() {
-      biz.selectFolder().then((data: any) => {
-        ([this.apiForm.outputPath] = data);
-      });
+      if (this.$IS_E) {
+        biz.selectFolder().then((data: any) => {
+          ([this.apiForm.outputPath] = data);
+        });
+      } else {
+        this.FolderDialogVisible = true;
+      }
+    },
+    folderSelectConfirm(path: string) {
+      if (path !== '') {
+        this.apiForm.outputPath = path;
+      }
+      this.FolderDialogVisible = false;
     },
   },
 });
