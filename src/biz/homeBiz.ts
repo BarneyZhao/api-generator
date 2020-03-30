@@ -5,7 +5,7 @@ export function getApiInfo(wikiUrl: string, wikiCookie: string) {
 }
 
 export function checkFile(filePath: string) {
-  return eu.req({ name: 'checkFileExist', params: filePath });
+  return eu.req({ name: 'checkFileExist', params: { filePath } });
 }
 
 export function generateApiFile(apiSettings: any) {

@@ -258,6 +258,8 @@ export default Vue.extend({
 <style scoped lang="less">
 .home {
   padding: 2rem;
+  width: 1280px;
+  margin: auto;
 }
 .main {
   padding-right: 45px;

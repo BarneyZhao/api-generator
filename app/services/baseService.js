@@ -4,9 +4,9 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const globby = require('globby');
 
-const API_MUSTACHE = `${__dirname}/../template/api.mustache`;
-const API_BASE_MUSTACHE = `${__dirname}/../template/api-base.mustache`;
-const REQUEST_MUSTACHE = `${__dirname}/../template/request.mustache`;
+const API_MUSTACHE = `${global.templatePath}/api.mustache`;
+const API_BASE_MUSTACHE = `${global.templatePath}/api-base.mustache`;
+const REQUEST_MUSTACHE = `${global.templatePath}/request.mustache`;
 
 const NUMBER = '[object Number]';
 const STRING = '[object String]';
@@ -16,7 +16,7 @@ const OBJECT = '[object Object]';
 const NULL = '[object Null]';
 const UNDEFINED = '[object Undefined]';
 
-const checkFileExist = filePath => new Promise((resolve, reject) => {
+const checkFileExist = ({ filePath }) => new Promise((resolve, reject) => {
   resolve(FS.existsSync(filePath));
 });
 
@@ -35,7 +35,7 @@ const readTempAndWriteFile = (template, filePath, tempObj = {}) => {
 const checkApiBaseFile = async (outputPath) => {
   const apiBaseFilePath = `${outputPath}/Api.ts`;
   const requestFilePath = `${outputPath}/request.ts`;
-  const flag = await checkFileExist(apiBaseFilePath);
+  const flag = await checkFileExist({ filePath: apiBaseFilePath });
   if (!flag) {
     readTempAndWriteFile(API_BASE_MUSTACHE, apiBaseFilePath);
     readTempAndWriteFile(REQUEST_MUSTACHE, requestFilePath);

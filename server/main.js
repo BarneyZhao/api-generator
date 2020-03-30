@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const chalk = require('chalk');
 
 // const config = require(path.join(__dirname, '/config'));
 const app = express();
@@ -11,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-// global.rootpath = __dirname;
+global.templatePath = path.join(__dirname, '/../template');
 
 // middleware
 app.use(require('./middlewares/crossOrigin'));
@@ -21,7 +22,7 @@ app.use(require('./middlewares/apiLog'));
 app.use(require('./controllers/baseController'));
 
 // server startup
-const server = app.listen(process.env.PORT || 3000, () => {
-  console.log(`Listening on port ${server.address().port}...`);
+const server = app.listen(process.env.PORT || 8000, () => {
+  console.log('\n\t', chalk.green(`Opening on localhost:${server.address().port}\n`));
 });
 server.setTimeout(0);
