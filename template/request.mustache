@@ -8,8 +8,8 @@ const NULL = '[object Null]';
 const UNDEFINED = '[object Undefined]';
 
 function parseData(metadata: any, resData: any, path = '') {
-    if (!metadata) return resData;
     const metadataType = Object.prototype.toString.call(metadata);
+    if (metadataType === NULL || metadataType === UNDEFINED) return resData;
     const resDataType = Object.prototype.toString.call(resData);
     const isResDataValid = resDataType !== NULL && resDataType !== UNDEFINED;
     const isResDataFitMeta = metadataType === resDataType;
@@ -29,14 +29,14 @@ function parseData(metadata: any, resData: any, path = '') {
         returnData = {};
         if (isResDataFitMeta) {
             Object.entries(resData).forEach(([key, val]) => {
-                if (metadata[key] === UNDEFINED && env !== 'prod') {
+                if (Object.prototype.toString.call(metadata[key]) === UNDEFINED && env !== 'prod') {
                     console.warn(`${key} in ${path} is not defined in [api].ts`);
                 }
                 returnData[key] = parseData(metadata[key], val, `${path}['${key}']`);
             });
             // 反向检查 meta 里是否有 resData 没有的 key
             Object.entries(metadata).forEach(([key, val]) => {
-                if (resData[key] === UNDEFINED && env !== 'prod') {
+                if (Object.prototype.toString.call(resData[key]) === UNDEFINED && env !== 'prod') {
                     console.warn(`${key} in meta but not in resData : ${path}`);
                 }
             });
@@ -53,15 +53,28 @@ export const request = <T>({ method = 'get', url, localUrl, mockUrl, body = null
     // 环境切换
     let reqMethod = method;
     let reqUrl = url;
-    if (env === 'local' && localUrl) {// 本地数据
-        reqMethod = 'get';
-        reqUrl = localUrl;
-    } else if (env === 'mock' && mockUrl) { // mock 数据
-        reqUrl = mockUrl;
+    if (env === 'dev') {
+        if (localUrl) {
+            reqMethod = 'get';
+            reqUrl = localUrl;
+            console.warn(`using localUrl: ${localUrl}`);
+        } else if (mockUrl) {
+            reqUrl = mockUrl;
+            console.warn(`using mockUrl: ${mockUrl}`);
+        }
     }
+    const apiParam = method === 'get' ? {
+        params: body,
+    } : {
+        data: body,
+    };
 
     return new Promise<T>((resolve, reject) => {
-        // axios().then(res => {
+        // axios({
+        //    method: reqMethod,
+        //    url: reqUrl,
+        //    ...apiParam,
+        // }).then(res => {
         //     resolve(parseData(resultMeta, res.body, `${reqUrl} : `));
         // })
     });
